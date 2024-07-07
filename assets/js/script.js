@@ -68,25 +68,73 @@ function renderTaskList() {
 
 // Todo: create a function to handle adding a new task
 function handleAddTask(event){
+    event.preventDefault();
+  const title = $("#task-title").val();
+  const description = $("#task-description").val();
+  const dueDate = $("#task-due-date").val();
+
+  const newTask = {
+      id: generateTaskId(),
+      title: title,
+      description: description,
+      dueDate: dueDate,
+      status: "todo"
+  };
+  taskList.push(newTask);
+  localStorage.setItem("tasks", JSON.stringify(taskList));
+  localStorage.setItem("nextId", JSON.stringify(nextId));
+
+  renderTaskList();
+
+  const addTaskForm = $("#add-task-form");
+  if (addTaskForm.length > 0) {
+      addTaskForm[0].reset();
+  }
+
+  $("#formModal").modal("hide");
 
 }
 
 // Todo: create a function to handle deleting a task
-function handleDeleteTask(event){
-
+    function handleDeleteTask(event) {
+        const taskId = $(event.target).closest('.card').data('id');
+        taskList = taskList.filter(task => task.id !== taskId);
+        localStorage.setItem("tasks", JSON.stringify(taskList));
+        renderTaskList();
 }
 
 // Todo: create a function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
+    const taskId = ui.draggable.data('id');
+    const newStatus = $(this).attr('id').replace('-cards', '');
 
+    taskList = taskList.map(task => {
+        if (task.id === taskId) {
+          task.status = newStatus;
+        }
+        return task;
+      });
+
+      localStorage.setItem("tasks", JSON.stringify(taskList));
+      renderTaskList();
 }
 
 // Todo: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
+    renderTaskList();
 
-    $( function() {
-        $( "#task-due-date" ).datepicker({
-          showButtonPanel: true
-        });
-      } );
-});
+    ['#todo-cards', '#in-progress', '#done'].forEach(function (status) {
+      $(status).droppable({
+        accept: '.draggable-task',
+        drop: handleDrop
+      });
+    });
+  
+    $('#add-task-form').submit(handleAddTask);
+  
+    $('#task-due-date').datepicker({
+      dateFormat: 'yy-mm-dd'
+    });
+  });
+    
+     
