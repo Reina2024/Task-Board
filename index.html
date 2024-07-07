@@ -33,7 +33,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class=”modal-body container”>
-            <form id=”add-taskForm” class=”modalBody row”>
+            <form id=”task-form” class=”modalBody row”>
               <div class=”modalBodyC”>
               <label for="task-title">Task Title</label>
               <input type="text" class="form-input" id="task-title" name="task-title">
@@ -46,8 +46,8 @@
                   <label for="task-description">Task Description</label>
                   <textarea type="text" class="form-control" id="task-description" name="task-title" rows="3"></textarea>
                 </div>
-<alert id="form-reminder" class="alert" role="alert"></alert>
-<button type="submit" class="btn btn-primary">Add Task</button>
+<small id="form-reminder" class="alert" role="alert"></small>
+<button type="submit" class="btn btn-primary" id="task-submit">Add Task</button>
 </div>
 </form>
 </div>
