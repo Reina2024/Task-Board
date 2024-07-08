@@ -40,31 +40,27 @@ function createTaskCard(task) {
 
 // Todo: create a function to render the task list and make cards draggable
 function renderTaskList() {
-    ['todo', 'in-progress', 'done'].forEach(status => {
-        $(`#${status}-cards`).empty();
-        taskList.filter(task => task.status === status).forEach(task => {
-          const taskCard = createTaskCard(task);
-          const $taskCard = $(taskCard);
+    $("#task-title").val("");
+    $("#task-due-date").val("");
+    $("#task-description").val("");
+    $("#form-reminder, #todo-kanban, #in-progress-kanban, #done-kanban").text("");
 
-          $taskCard.addClass('draggable-task');
-
-          $(`#${status}-cards`).append($taskCard);
-          $taskCard.draggable({
-            revert: 'invalid',
-            start: function() {
-              $(this).css('z-index', 1000);
-            },
-            stop: function() {
-              $(this).css('z-index', '');
-            }
-          });
-          if (status === 'done') {
-            $taskCard.removeClass('bg-danger bg-warning');
-          }
-        });
+    taskList.forEach(task => {
+        if (task !== null) createTaskCard(task);
       });
-      $('.delete-task').click(handleDeleteTask);
-    }
+      $("#todo-kanban, #in-progress-kanban, #done-kanban").sortable({
+        connectWith: ".kanban",
+        cursor: "move", 
+        helper: "clone", 
+        receive: handleDrop, 
+        cancel: ".delete"
+      });
+
+      $("li").on("click", ".delete", handleDeleteTask);
+}
+
+
+
 
 // Todo: create a function to handle adding a new task
 function handleAddTask(event){
