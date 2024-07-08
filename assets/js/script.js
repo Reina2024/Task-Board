@@ -1,10 +1,8 @@
 // Retrieve tasks and nextId from localStorage
-let taskList = JSON.parse(localStorage.getItem("tasks"));
-let nextId = JSON.parse(localStorage.getItem("nextId"));
+let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+let nextId = JSON.parse(localStorage.getItem("nextId")) || 1;
 
-const todo = "todo";
-const inProgress = "in-progress";
-const done = "done";
+
 // Todo: create a function to generate a unique task id
 function generateTaskId() {
     return nextId++;
@@ -12,11 +10,14 @@ function generateTaskId() {
 
 // Todo: create a function to create a task card
 function createTaskCard(task) {
-    const dueDate = dayjs(task.dueDate);
-    const currentDate = dayjs();
-    const isOverdue = dueDate.isBefore(currentDate);
-    const isNearingDeadline = dueDate.diff(currentDate, 'day') <= 2 && !isOverdue;
-    let cardClass = '';
+  const dueDate = dayjs(task.dueDate);
+  const currentDate = dayjs();
+  const isOverdue = dueDate.isBefore(currentDate);
+  const isNearingDeadline = dueDate.diff(currentDate, 'day') <= 2 && !isOverdue;
+  
+  let cardClass = '';
+
+  
   
     if (isOverdue) {
       cardClass = 'bg-danger text-black';
@@ -40,23 +41,35 @@ function createTaskCard(task) {
 
 // Todo: create a function to render the task list and make cards draggable
 function renderTaskList() {
-    $("#task-title").val("");
-    $("#task-due-date").val("");
-    $("#task-description").val("");
-    $("#form-reminder, #todo-kanban, #in-progress-kanban, #done-kanban").text("");
+  ['todo', 'in-progress', 'done'].forEach(status => {
+    $(`#${status}-cards`).empty();
+    taskList.filter(task => task.status === status).forEach(task => {
+      const taskCard = createTaskCard(task);
+      const $taskCard = $(taskCard); // Convert to jQuery object
 
-    taskList.forEach(task => {
-        if (task !== null) createTaskCard(task);
-      });
-      $("#todo-kanban, #in-progress-kanban, #done-kanban").sortable({
-        connectWith: ".kanban",
-        cursor: "move", 
-        helper: "clone", 
-        receive: handleDrop, 
-        cancel: ".delete"
-      });
+      
+      $taskCard.addClass('draggable-task');
 
-      $("li").on("click", ".delete", handleDeleteTask);
+      
+      $(`#${status}-cards`).append($taskCard);
+
+      
+      $taskCard.draggable({
+        revert: 'invalid',
+        start: function() {
+          $(this).css('z-index', 1000);
+        },
+        stop: function() {
+          $(this).css('z-index', '');
+        }
+      });
+      if (status === 'done') {
+        $taskCard.removeClass('bg-danger bg-warning');
+      }
+    });
+  });
+
+  $('.delete-task').click(handleDeleteTask);
 }
 
 
